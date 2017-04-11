@@ -6,3 +6,10 @@ C:\Users\larsm\onedrive\documents\visual studio 2013\Projects\ServerTest\ServerT
 C:\Users\larsm\onedrive\documents\visual studio 2013\Projects\ServerTest\ServerTest\obj\Release\ServerTest.csprojResolveAssemblyReference.cache
 C:\Users\larsm\onedrive\documents\visual studio 2013\Projects\ServerTest\ServerTest\obj\Release\ServerTest.exe
 C:\Users\larsm\onedrive\documents\visual studio 2013\Projects\ServerTest\ServerTest\obj\Release\ServerTest.pdb
+D:\Hellion Main Server\ServerTest\bin\Release\ServerTest.exe.config
+D:\Hellion Main Server\ServerTest\obj\Release\ServerTest.exe
+D:\Hellion Main Server\ServerTest\obj\Release\ServerTest.pdb
+D:\Hellion Main Server\ServerTest\bin\Release\ServerTest.exe
+D:\Hellion Main Server\ServerTest\bin\Release\ServerTest.pdb
+D:\Hellion Main Server\ServerTest\bin\Release\Newtonsoft.Json.dll
+D:\Hellion Main Server\ServerTest\obj\Release\ServerTest.csprojResolveAssemblyReference.cache

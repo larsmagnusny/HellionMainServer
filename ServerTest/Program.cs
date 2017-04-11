@@ -322,7 +322,53 @@ namespace ServerTest
     public static class CharacterListClass
     {
         public static Dictionary<long, CharacterData> Characters = new Dictionary<long, CharacterData>();
-        public static int Counter = 0;
+        public static long Counter = 1;
+    };
+
+    public static class DeletedCharacterListClass
+    {
+        public static Dictionary<long, CharacterData> Characters = new Dictionary<long, CharacterData>();
+        public static long Counter = 1;
+    };
+
+    public static class SaveLoadClass
+    {
+        public static void SaveCharacterList()
+        {
+            CharacterListResponse CharacterList = new CharacterListResponse
+            {
+                Characters = CharacterListClass.Characters
+            };
+
+            byte[] data = Serializer.Serialize(CharacterList);
+
+            BinaryWriter Writer = new BinaryWriter(new FileStream("./CharacterData.bin", FileMode.Create));
+
+            Writer.Write(data);
+            Writer.Close();
+        }
+
+        public static void LoadCharacterList(out Dictionary<long, CharacterData> Data)
+        {
+            Data = new Dictionary<long, CharacterData>();
+
+            if (File.Exists("./CharacterData.bin"))
+            {
+                byte[] buffer = File.ReadAllBytes("./CharacterData.bin");
+
+                NetworkData NetworkPackage = Serializer.ReceiveData(new MemoryStream(buffer));
+
+
+                if (NetworkPackage != null)
+                {
+                    if (NetworkPackage.GetType() == typeof(CharacterListResponse))
+                    {
+                        CharacterListResponse List = (CharacterListResponse)NetworkPackage;
+                        Data = List.Characters;
+                    }
+                }
+            }
+        }
     }
 
     class Program
@@ -335,6 +381,15 @@ namespace ServerTest
         
         static void Main(string[] args)
         {
+            SaveLoadClass.LoadCharacterList(out CharacterListClass.Characters);
+
+
+
+            if (CharacterListClass.Characters.Count != 0)
+            {
+                CharacterData data = CharacterListClass.Characters.Values.Last();
+                CharacterListClass.Counter = CharacterListClass.Characters.Values.Last().Id + 1;
+            }
             ServerListenThread SLInstance = new ServerListenThread();
             GameClientListenThread GCLInstance = new GameClientListenThread();
 

@@ -11,7 +11,7 @@ namespace ServerTest
 {
     class GameClientListenThread
     {
-        public void TellGameServerToConnectToClient(IPAddress ip, int port)
+        public void TellGameServerToConnectToClient(IPAddress ip, int port, CharacterData Data)
         {
             IPEndPoint remoteEP = new IPEndPoint(ip, port);
 
@@ -23,27 +23,17 @@ namespace ServerTest
 
                 NetworkStream stream = new NetworkStream(sender);
 
-                CharacterData d;
-                CharacterListClass.Characters.TryGetValue(0, out d);
-
                 CharacterDataResponse cData = new CharacterDataResponse
                 {
                     //CharacterData = d.ToString(),
-                    CharacterId = d.Id,
-                    CharacterName = d.Name,
-                    SteamId = d.SteamId
+                    CharacterId = Data.Id,
+                    CharacterName = Data.Name,
+                    SteamId = Data.SteamId
                 };
 
                 byte[] buffer = Serializer.Serialize(cData);
 
                 stream.Write(buffer, 0, buffer.Length);
-
-                //NetworkData data = Serializer.ReceiveData(stream);
-
-               // if(data != null)
-                //{
-                //    Console.WriteLine(data.GetType());
-                //}
 
                 stream.Close();
                 sender.Close();
@@ -52,6 +42,8 @@ namespace ServerTest
 
             }
         }
+
+        
 
         public void ServerListener()
         {
@@ -131,6 +123,8 @@ namespace ServerTest
 
                         CharacterListClass.Characters.Add(dat.Id, dat);
 
+                        SaveLoadClass.SaveCharacterList();
+
                         CreateCharacterResponse Res = new CreateCharacterResponse
                         {
                             CharacterID = dat.Id
@@ -146,7 +140,27 @@ namespace ServerTest
                         ServerListClass.Servers.TryGetValue(0, out server);
 
                         IPAddress ip = IPAddress.Parse(server.Address);
-                        TellGameServerToConnectToClient(ip, server.GamePort);
+                        TellGameServerToConnectToClient(ip, server.GamePort, dat);
+                    }
+                    if(data1.GetType() == typeof(CharacterDataRequest))
+                    {
+                        CharacterDataRequest Request = (CharacterDataRequest)data1;
+                        Console.WriteLine(Request.CharacterId);
+                        Console.WriteLine(Request.ServerId);
+
+                        CharacterData Data;
+                        CharacterListClass.Characters.TryGetValue(Request.CharacterId, out Data);
+
+                        CharacterDataResponse Response = new CharacterDataResponse
+                        {
+                            CharacterId = Data.Id,
+                            CharacterName = Data.Name,
+                            SteamId = Data.SteamId
+                        };
+
+                        byte[] data = Serializer.Serialize(Response);
+
+                        CryptoHelper.WriteResponse(nwStream, data, RemoteKey);
                     }
                 }
                 else

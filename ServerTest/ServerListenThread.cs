@@ -36,7 +36,28 @@ namespace ServerTest
                     {
                         Console.WriteLine(data1.GetType().ToString());
 
-                        if(data1.GetType() == typeof(GetDeletedCharactersRequest))
+                        if (data1.GetType() == typeof(CharacterDataRequest))
+                        {
+                            CharacterDataRequest Request = (CharacterDataRequest)data1;
+                            Console.WriteLine(Request.CharacterId);
+                            Console.WriteLine(Request.ServerId);
+
+                            CharacterData Data;
+                            CharacterListClass.Characters.TryGetValue(Request.CharacterId, out Data);
+
+                            CharacterDataResponse Response = new CharacterDataResponse
+                            {
+                                CharacterId = Data.Id,
+                                CharacterName = Data.Name,
+                                SteamId = Data.SteamId
+                            };
+
+                            byte[] data = Serializer.Serialize(Response);
+
+                            nwStream.Write(data, 0, data.Length);
+                        }
+
+                        if (data1.GetType() == typeof(GetDeletedCharactersRequest))
                         {
                             GetDeletedCharactersRequest Req = (GetDeletedCharactersRequest)data1;
 
@@ -47,8 +68,8 @@ namespace ServerTest
 
                             CharacterListResponse Response = new CharacterListResponse
                             {
-                                Response = ResponseResult.Success
-                                //Characters = CharacterListClass.Characters
+                                Response = ResponseResult.Success,
+                                Characters = DeletedCharacterListClass.Characters
                             };
 
                             byte[] SendData = Serializer.Serialize(Response);
